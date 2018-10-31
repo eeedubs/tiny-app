@@ -1,4 +1,4 @@
-<!-- all links -->
+<!-- all links  http://localhost:8010/urls-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +6,17 @@
 </head>
 <body>
      <% for (var url in urls) { %> 
-        <li><%= url %> --> <%= urls[url] %> (<a href='<%= urls[url] %>'>Link</a>)</li>
+        <div style="margin: 10px;">
+            <%= url %> --> <a href='<%= urls[url] %>'> <%= urls[url] %></a> 
+            <form style="display: inline-block;" action="/urls/<%= url %>" method="GET">
+                <!-- 'method' handles an editing action (GET) -->
+                <input type="submit" value="Edit">
+            </form>
+            <form style="display: inline-block;" action="/urls/<%= url %>/delete" method="POST">
+                <!-- 'method' causes a deletion action (POST) -->
+                <input type="submit" value="Delete">
+            </form>
+        </div>
     <% }; %>
 </body>
 </html>
