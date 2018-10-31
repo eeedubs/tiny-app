@@ -1,0 +1,12 @@
+<!-- all links -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/_header %>
+</head>
+<body>
+     <% for (var url in urls) { %> 
+        <li><%= url %> --> <%= urls[url] %> (<a href='<%= urls[url] %>'>Link</a>)</li>
+    <% }; %>
+</body>
+</html>
