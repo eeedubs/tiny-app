@@ -5,8 +5,9 @@
     <% include ../partials/_header %>
 </head>
 <body>
+    <h4>URL Index</h4>
      <% for (var url in urls) { %> 
-        <div style="margin: 10px;">
+        <div style="padding-bottom: 15px">
             <%= url %> --> <a href='<%= urls[url] %>'> <%= urls[url] %></a> 
             <form style="display: inline-block;" action="/urls/<%= url %>" method="GET">
                 <!-- 'method' handles an editing action (GET) -->
@@ -17,6 +18,14 @@
                 <input type="submit" value="Delete">
             </form>
         </div>
-    <% }; %>
+    <% } %>
+    <h4>Add URL To Index</h4>
+    <div>
+        <form action="/urls" method="POST">
+            <label for="longURL">Enter a URL:</label>
+            <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
+            <input type="submit" value="Shorten URL">
+        </form>
+    </div>
 </body>
 </html>

@@ -7,6 +7,7 @@
     <!-- adds the header from ../partials/_header -->
 </head>
 <body>
+    <h4>Edit Shortened URL:</h4>
     <div style="font-size: 40">
        <a href="<%= longURL %>"><%= longURL %></a> --> <%= shortURL %> 
     </div>
@@ -18,6 +19,14 @@
     <!-- name is connected to the express_server.js document; placeholder is what is held in the blank field -->
             <input type="submit" value="Update">
     <!-- 'type' makes sure that "Update" is a button, while 'value' displays what is in that field -->
+        </form>
+    </div>
+    <h4>Add URL To Index</h4>
+    <div>
+        <form action="/urls" method="POST">
+            <label for="longURL">Enter a URL:</label>
+            <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
+            <input type="submit" value="Shorten URL">
         </form>
     </div>
 </body>

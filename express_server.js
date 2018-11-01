@@ -1,11 +1,13 @@
 var express = require("express");
 var app = express();
 var PORT = 8010; // default port 8080
+var cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
-app.set("view engine", "ejs")
+app.set("view engine", "ejs");
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -33,24 +35,36 @@ app.get("/hello", (req, res) => {
 });
 // sends the text in HTML format to the page 
 
-app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
-});
-// passing the urls from urlDatabase to the urls_index.ejs file
-
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  if (req.cookies){
+    const value = req.cookies["username"];
+    res.render("urls_new", value);
+  } else {
+    res.render("urls_new");
+  }
 });
+// renders to urls_new
 // this route must be before the GET /urls:id route, otherwise the :id placeholder
 // will match the string "new" 
 
 app.get("/urls/:id", (req, res) => { // :id could be named anything
   let id = req.params.id; // get the id from the requirement parameters
-  let templateVars = { // templateVars gets rendered to urls_show.ejs
-    shortURL: id,
-    longURL: urlDatabase[id] };
-  res.render("urls_show", templateVars);
+  if (req.cookies){
+    const value = req.cookies["username"];
+    let templateVars = {
+      shortURL: id,
+      longURL: urlDatabase[id],
+      username: value
+    };
+    res.render("urls_show", templateVars)
+  } else {
+    let templateVars = { // templateVars gets rendered to urls_show.ejs
+      shortURL: id,
+      longURL: urlDatabase[id],
+      username: ""
+    };
+    res.render("urls_show", templateVars);
+  }
 });
 // 
 
@@ -65,12 +79,30 @@ app.get("/u/:shortURL", (req, res) => {
 });
 // handles the LINKING: attachs the shortURL to localhost:8010/u/
 
+app.get("/urls", (req, res) => {
+  if(req.cookies){
+    const value = req.cookies["username"];
+    let templateVars = { 
+      urls: urlDatabase,
+      username: value
+    };
+    res.render("urls_index", templateVars);
+  } else{
+    let templateVars = { 
+      urls: urlDatabase,
+      username: ""
+    };
+    res.render("urls_index", templateVars);
+  }
+});
+// passing the urls from urlDatabase to the urls_index.ejs file
+
 app.post("/urls", (req, res) => {
   const response = generateRandomString(); // assigns a constant to the randomly generated string
   const longURL = req.body.longURL;
   urlDatabase[response] = longURL;   // add a key-value pair to the urlDatabase
   console.log("Added key-value pair { " + response + ": " + longURL + " } to the urlDatabase.")
-  res.redirect(301, 'http://localhost:8010/urls/'); // Respond with the random string
+  res.redirect(301, '/urls'); // Respond with the random string
 });
 // handles ADD: adds a new item to the urlDatabase
 
@@ -92,6 +124,18 @@ app.post("/urls/:id/update", (req, res) => {
   res.redirect('/urls/' + id);
 })
 // handles EDIT: editing the longURL to which a short ID routes.
+
+app.post("/login", (req, res) => {
+  const value = req.body.username;
+  res.cookie('username', value);
+  res.redirect('/urls');
+});
+
+app.post("/logout", (req, res) => {
+  console.log("clearing cookie");
+  res.clearCookie('username');
+  res.redirect('/urls');
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
