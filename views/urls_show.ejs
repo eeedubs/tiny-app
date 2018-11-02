@@ -14,8 +14,8 @@
     <br>
     <div style="display: inline-block"> 
         <form style="display: inline-block;" action="/urls/<%= shortURL %>/update" method="POST">
-    <!-- Style makes sure the form is on the same line; Action refers back to the express_server.js app.get method -->
-            <input id="updateURL" type="text" name="updateURL" placeholder="<%= longURL %>" style="width: 300px">
+    <!-- Style makes sure the form is on the same line; Action refers back to the express_server.js app.post method -->
+            <input id="updateURL" type="text" name="updateURL" placeholder="Updated URL" style="width: 300px">
     <!-- name is connected to the express_server.js document; placeholder is what is held in the blank field -->
             <input type="submit" value="Update">
     <!-- 'type' makes sure that "Update" is a button, while 'value' displays what is in that field -->

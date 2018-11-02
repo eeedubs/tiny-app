@@ -1,14 +1,16 @@
 <h2>URL Shortener</h1>
-<% if (username && (username !== undefined)) { %>
+<% if (userID) { %>
     <div style="display: inline-block">
-        Username: <%= username %>
+        Logged in as <%= userID.id %>
         <form style="display: inline-block" action="/logout" method="POST">
             <input type="submit" value="Logout">
         </form>
     </div>
 <% } else {%>
-    <form style="display: inline-block;" action="/login" method="POST">
-        <input type="text" name="username" placeholder="username" style="width: 200px">
+    <form style="display: inline-block;" action="/login" method="GET">
         <input type="submit" value="Login">
+    </form>
+    <form style="display: inline-block;" action="/register" method="GET">
+        <input type="submit" value="Sign Up">
     </form>
 <% } %>
