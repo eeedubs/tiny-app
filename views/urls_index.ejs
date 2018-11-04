@@ -6,26 +6,26 @@
 </head>
 <body>
     <h4>URL Index</h4>
-     <% for (var url in urls) { %> 
-        <div style="padding-bottom: 15px">
-            <%= url %> --> <a href='<%= urls[url] %>'> <%= urls[url] %></a> 
-            <form style="display: inline-block;" action="/urls/<%= url %>" method="GET">
-                <!-- 'method' handles an editing action (GET) -->
-                <input type="submit" value="Edit">
-            </form>
-            <form style="display: inline-block;" action="/urls/<%= url %>/delete" method="POST">
-                <!-- 'method' causes a deletion action (POST) -->
-                <input type="submit" value="Delete">
+    <% if (userID) { %>
+        <% for (var url in shortURLs) { %> 
+            <div style="padding-bottom: 15px">
+                <a href="localhost:8080/u/<%= shortURLs[url] %>">localhost:8080/u/<%= shortURLs[url] %></a> --> <%= longURLs[url] %>
+                <form style="display: inline-block; margin-left: 10px" action="/urls/<%= shortURLs[url] %>" method="GET">
+                    <input type="submit" value="Edit">
+                </form>
+                <form style="display: inline-block; border-radius: 10px;" action="/urls/<%= shortURLs[url] %>/delete" method="POST">
+                    <input type="submit" value="Delete">
+                </form>
+            </div>
+        <% } %>
+        <div>
+            <form action="/urls/new" method="GET">
+                <input style="border-radius: 10px; width: 80px; background-color: rgb(170, 170, 240); 
+                font-weight: bold" type="submit" value="Add a URL">
             </form>
         </div>
+    <% } else{ %>
+        <p> Please log in to view your shortened URLs index, or create an account.</p>
     <% } %>
-    <h4>Add URL To Index</h4>
-    <div>
-        <form action="/urls" method="POST">
-            <label for="longURL">Enter a URL:</label>
-            <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
-            <input type="submit" value="Shorten URL">
-        </form>
-    </div>
 </body>
 </html>

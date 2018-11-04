@@ -1,14 +1,27 @@
 <!-- takes in new URLs http://localhost:8010/urls/new -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-      <% include ../partials/_header %>
-  </head>
-  <body style="font-size:20px;">
-    <form action="/urls" method="POST" style="padding-top: 30px">
-      <label for="longURL">Enter a URL:</label>
-      <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
-      <input type="submit" value="Shorten URL">
-    </form>
-  </body>
+<head>
+  <% include ../partials/_header %>
+</head>
+<body>
+  <% if (userID) { %>
+    <p style="font-size:20px;">  
+      <form action="/urls" method="POST">
+        <label for="longURL" style="font-weight: bold">Enter a URL:</label>
+        <br>
+        <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
+        <input style="margin-top: 10px; width: 90px; background-color: rgb(170, 170, 240);
+        border-radius: 10px; font-weight: bold; display: inline-block" type="submit" value="Shorten URL">
+      </form>
+      <form style="display: inline-block; margin-top: 10px" action="/urls" method="GET">
+        <input type="submit" value="Back to Index">
+      </form>
+    </p>
+    <% } else{ %>
+      <p> 
+        Please log in or create an account to shorten URLs.
+      </p>
+    <% } %> 
+</body>
 </html>

@@ -7,27 +7,31 @@
     <!-- adds the header from ../partials/_header -->
 </head>
 <body>
-    <h4>Edit Shortened URL:</h4>
+ <h4>Edit Shortened URL:</h4>
+ <% if (userID) { %>
     <div style="font-size: 40">
-       <a href="<%= longURL %>"><%= longURL %></a> --> <%= shortURL %> 
+        <a href="<%= longURLs %>">localhost:8080/u/<%= shortURLs %></a> --> <%= longURLs %>
     </div>
     <br>
     <div style="display: inline-block"> 
-        <form style="display: inline-block;" action="/urls/<%= shortURL %>/update" method="POST">
-    <!-- Style makes sure the form is on the same line; Action refers back to the express_server.js app.post method -->
+        <form style="display: inline-block;" action="/urls/<%= shortURLs %>/update" method="POST">
             <input id="updateURL" type="text" name="updateURL" placeholder="Updated URL" style="width: 300px">
-    <!-- name is connected to the express_server.js document; placeholder is what is held in the blank field -->
-            <input type="submit" value="Update">
-    <!-- 'type' makes sure that "Update" is a button, while 'value' displays what is in that field -->
+            <input style="font-weight: bold; border-radius: 10px; background-color: rgb(170, 170, 240)" 
+            type="submit" value="Update">
+        </form>
+        <form style="display: inline-block;" action="/urls" method="GET">
+            <input style="border-radius:10px" type="submit" value="Back to Index">
         </form>
     </div>
     <h4>Add URL To Index</h4>
     <div>
-        <form action="/urls" method="POST">
-            <label for="longURL">Enter a URL:</label>
-            <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
-            <input type="submit" value="Shorten URL">
+        <form action="/urls/new" method="GET">
+            <input style="width: 80px; border-radius: 10px; font-weight: bold; background-color: rgb(170, 170, 240);" 
+            type="submit" value="Add a URL">
         </form>
     </div>
+    <% } else { %>
+        <p>Please log in or create an account to edit shortened URLs.</p>
+    <% } %>
 </body>
 </html>

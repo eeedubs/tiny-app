@@ -3,12 +3,19 @@
 <html lang="en">
     <h2>
         URL Shortener
-    </h1>
+    </h2>
     <p> Create an account:
-        <form style="display: inline-block" action="/register" method="POST">
-            <input type="email" name="email" placeholder="email" style="width: 200px">
-            <input type="password" name="password" placeholder="password" style="width: 200px">
-            <input type="submit" value="Register">
+        <form action="/register" method="POST">
+            <input type="email" name="email" placeholder="email" style="width: 300px"> 
+            <br>
+            <input style="margin-top: 5px; width: 300px" type="password" name="password" placeholder="password">
+            <br>
+            <input style="margin-top: 10px; float: left; width: 70px; background-color: rgb(170, 170, 240);
+            border-radius: 10px; font-weight: bold;" type="submit" value="Register">
+        </form>
+        <form style="display: inline-block" action="/login" method="GET">
+            <input style="margin-top: 10px; margin-left: 10px; float: left; width: 100px; border-radius: 10px" 
+            type="submit" value="Back to Login">
         </form>
     </p>
 </html>
