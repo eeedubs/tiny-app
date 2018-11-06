@@ -9,7 +9,7 @@
     <% if (userID) { %>
         <% for (var url in shortURLs) { %> 
             <div style="padding-bottom: 15px">
-                <a href="localhost:8080/u/<%= shortURLs[url] %>">localhost:8080/u/<%= shortURLs[url] %></a> --> <%= longURLs[url] %>
+                <a href="/u/<%= shortURLs[url] %>">localhost:8080/u/<%= shortURLs[url] %></a> --> <%= longURLs[url] %>
                 <form style="display: inline-block; margin-left: 10px" action="/urls/<%= shortURLs[url] %>" method="GET">
                     <input type="submit" value="Edit">
                 </form>

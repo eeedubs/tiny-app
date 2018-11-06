@@ -222,11 +222,9 @@ app.get("/u/:shortURL", (req, res) => {
   let longURL = getLongURL(shortURL);
   if (!urlDatabase[shortURL]){
     // if there is no shortURL in the URL database
-    res.redirect("/urls");
-    // redirect to the URL index
-  } else {
     res.status(400);
     res.send("400 bad Request Error: The shortened URL that you requested does not exist");
+  } else {
     res.redirect(301, longURL); 
     // else, redirect to the URL
   }
@@ -248,7 +246,7 @@ app.get("/urls", (req, res) => { // reads the /urls page
       "email": email
     };
     res.render("urls_index", templateVars);
-  } else if (!req.session.user_id){
+  } else {
     res.redirect("/login");
   }
 });
