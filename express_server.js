@@ -1,15 +1,11 @@
 var express = require("express");
 var app = express();
-var PORT = 8080; // default port 8080
-// var cookieParser = require('cookie-parser');
+var PORT = 8080;
 var cookieSession = require("cookie-session");
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 
 app.use(bodyParser.urlencoded({extended: true}));
-// app.use(cookieParser());
-
-// app.use(cookieSession());
 
 app.use(cookieSession({
   name: "session",
@@ -149,7 +145,11 @@ function longURLsForUser(id){
 // GET REQUESTS:
 
 app.get("/", (req, res) => { //adds "/" to the end of the localhost URL
-  res.send("Hello! Welcome to the homepage");
+  if (req.session.user_id === getCookie(req.session.user_id)){
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
 }); 
 // index page
 
@@ -158,12 +158,6 @@ app.get("/urls.json", (req, res) => { // adds "/urls.json" to the end of the loc
   res.json(urlDatabase);
 });
 // converts the JSON data from the urlDatabase variable
-
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-// sends the text in HTML format to the page 
 
 app.get("/login", (req, res) => {
   res.render("urls_login");
