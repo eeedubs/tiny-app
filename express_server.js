@@ -180,8 +180,8 @@ app.get("/urls/new", (req, res) => {
     const value = req.session.user_id;
     const email = getEmail(value);
     let templateVars = {
-      "userID": value,
-      "email": email
+      userID: value,
+      email
     };
     res.render("urls_new", templateVars);
   } else {
@@ -203,10 +203,10 @@ app.get("/urls/:id", (req, res) => {
       const value = req.session.user_id;
       const email = getEmail(value);
       let templateVars = {
-        "shortURLs": shortURL,
-        "longURLs": longURL,
-        "userID": value,
-        "email": email
+        shortURLs: shortURL,
+        longURLs: longURL,
+        userID: value,
+        email
       };
       res.render("urls_show", templateVars)
     }
@@ -222,8 +222,7 @@ app.get("/u/:shortURL", (req, res) => {
   let longURL = getLongURL(shortURL);
   if (!urlDatabase[shortURL]){
     // if there is no shortURL in the URL database
-    res.status(400);
-    res.send("400 bad Request Error: The shortened URL that you requested does not exist");
+    res.status(400).send("400 Bad Request Error: The shortened URL that you requested does not exist");
   } else {
     res.redirect(301, longURL); 
     // else, redirect to the URL
@@ -240,10 +239,10 @@ app.get("/urls", (req, res) => { // reads the /urls page
     let email = getEmail(value);
     let templateVars = { 
       // let template vars contain the urls and the username
-      "longURLs": longURLs,
-      "shortURLs": shortURLs,
-      "userID": value,
-      "email": email
+      longURLs: longURLs,
+      shortURLs: shortURLs,
+      userID: value,
+      email
     };
     res.render("urls_index", templateVars);
   } else {
@@ -261,8 +260,8 @@ app.post("/urls", (req, res) => {
   if (req.session.user_id === getCookie(req.session.user_id)){
     const userID = req.session.user_id;
     urlDatabase[response] = {
-      "link": longURL,
-      "id": userID
+      link: longURL,
+      id: userID
     }
     res.redirect("/urls");
   } else if (!req.session.user_login){
@@ -316,16 +315,13 @@ app.post("/login", (req, res) => {
         req.session.user_id = userID;
         res.redirect("/urls");
       } else {
-        res.status(400);
-        res.send("400 Bad Request Error: Cannot find a user with the email and/or password provided.");
+        res.status(400).send("400 Bad Request Error: Cannot find a user with the email and/or password provided.");
       }
     } else {
-      res.status(400);
-      res.send("400 Bad Request Error: Missing the user's password.");
+      res.status(400).send("400 Bad Request Error: Missing the user's password.");
     }
   } else {
-    res.status(400);
-    res.send("400 Bad Request Error: Missing the user's email.");
+    res.status(400).send("400 Bad Request Error: Missing the user's email.");
   }
 });
 // Handles LOGIN: logging in and storing the username
@@ -346,28 +342,24 @@ app.post("/register", (req, res) => {
   const hashedPassword = bcrypt.hashSync(userPass, 10);
   if (!userEmail && !userPass){
     // if no user and password, return error
-    res.status(400);
-    res.send("400 Bad Request Error: Missing email address and password.")
+    res.status(400).send("400 Bad Request Error: Missing email address and password.")
   } else if (!userEmail){
     // if no email, return error
-    res.status(400);
-    res.send("400 Bad Request Error: Email address is missing.");
+    res.status(400).send("400 Bad Request Error: Email address is missing.");
   } else if (!userPass){
     // if no password, return error
-    res.status(400);
-    res.send("400 Bad Request Error: Password is missing.");
+    res.status(400).send("400 Bad Request Error: Password is missing.");
   } else {
     // if email and password were entered, continue
     for (var user in users){
       if (userEmail === checkEmail(userEmail)){
-        res.status(400);
-        res.send("400 Bad Request Error: User's email address is already in use.");
+        res.status(400).send("400 Bad Request Error: User's email address is already in use.");
       }
     }
     users[randomID] = {
-      "id": randomID,
-      "email": userEmail,
-      "password": hashedPassword
+      id: randomID,
+      email: userEmail,
+      password: hashedPassword
     };
     req.session.user_id = randomID;
     res.redirect('/urls');
