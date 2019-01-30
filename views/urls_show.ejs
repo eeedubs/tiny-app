@@ -14,7 +14,7 @@
     </div>
     <br>
     <div style="display: inline-block"> 
-        <form style="display: inline-block;" action="/urls/<%= shortURLs %>/update" method="POST">
+        <form style="display: inline-block;" action="/urls/<%= shortURLs %>?_method=PUT" method="POST">
             <input id="updateURL" type="text" name="updateURL" placeholder="Updated URL" style="width: 300px">
             <input style="font-weight: bold; border-radius: 10px; background-color: rgb(170, 170, 240)" 
             type="submit" value="Update">

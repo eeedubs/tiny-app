@@ -1,11 +1,14 @@
-var express = require("express");
-var app = express();
-var PORT = 8080;
-var cookieSession = require("cookie-session");
+const express = require("express");
+const app = express();
+const PORT = 8080;
+const cookieSession = require("cookie-session");
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
+const methodOverride = require('method-override');
 
 app.use(bodyParser.urlencoded({extended: true}));
+
+app.use(methodOverride('_method'));
 
 app.use(cookieSession({
   name: "session",
@@ -16,7 +19,7 @@ app.set("view engine", "ejs");
 
 // GLOBAL VARIABLES:
 
-var urlDatabase = {
+const urlDatabase = {
   // "b2xVn2": {
   //   "link": "http://www.lighthouselabs.ca", 
   //   "id": ""
@@ -61,8 +64,8 @@ function getCookie(userID){
 // the user can access the content/features
 
 function getUserID (email, password){
-  var userID = "";
-  for (var key in users){
+  let userID = "";
+  for (let key in users){
     if (users[key].email === email && (bcrypt.compareSync(password, users[key].password))){
       userID = key;
     }
@@ -72,8 +75,8 @@ function getUserID (email, password){
 // for the /login page: get's the user's ID according to the entered email and password
 
 function checkEmail(email){
-  var foundEmail;
-  for (var key in users){
+  let foundEmail;
+  for (let key in users){
     if (users[key].email === email){
       foundEmail = users[key].email;
     }
@@ -83,8 +86,8 @@ function checkEmail(email){
 // for the POST /register page: checks if a user's e-mail is already in the system
 
 function getEmail(id){
-  var userEmail;
-  for (var key in users){
+  let userEmail;
+  for (let key in users){
     if (users[key].id === id){
       userEmail = users[key].email;
     }
@@ -94,8 +97,8 @@ function getEmail(id){
 // for the GET /urls/new, /urls/:id, and /urls pages, gets the user's email based on their ID
 
 function validateUser(email, password){
-  var validate = false;
-  for (var key in users){
+  let validate = false;
+  for (let key in users){
     if((users[key].email === email) && (bcrypt.compareSync(password, users[key].password))){
       validate = true;
     }
@@ -105,8 +108,8 @@ function validateUser(email, password){
 // for the POST /login page: evaluates if the user's email and password match a user in the system (value)
 
 function getLongURL(shortURL){
-  var longURL;
-  for (var key in urlDatabase){
+  let longURL;
+  for (let key in urlDatabase){
     if (key === shortURL){
       // console.log("function getLongURL(shortURL): got the long URL");
       longURL = urlDatabase[key].link;
@@ -117,8 +120,8 @@ function getLongURL(shortURL){
 // gets the long URL based on the short URL
 
 function shortURLsForUser(id){
-  var userURLs = [];
-  for (var url in urlDatabase){
+  let userURLs = [];
+  for (let url in urlDatabase){
     if (urlDatabase[url].id === id){
       userURLs.push(url);
       // console.log("function shortURLsForUser(id): " + userURLs);
@@ -129,8 +132,8 @@ function shortURLsForUser(id){
 // returns an array of the short URLs that the user created
 
 function longURLsForUser(id){
-  var userURLs = [];
-  for (var url in urlDatabase){
+  let userURLs = [];
+  for (let url in urlDatabase){
     if (urlDatabase[url].id === id){
       userURLs.push(urlDatabase[url].link);
       // console.log("function longURLsForUser(id): " + userURLs);
@@ -139,8 +142,6 @@ function longURLsForUser(id){
   return userURLs;
 }
 // returns an array of the short URLs that the user created
-
-
 
 // GET REQUESTS:
 
@@ -177,8 +178,8 @@ app.get("/register", (req, res) => {
 app.get("/urls/new", (req, res) => {
   if (req.session.user_id === getCookie(req.session.user_id)){ 
     // console.log("app.get '/urls/new': Cookie matched a user in the database."); 
-    const value = req.session.user_id;
-    const email = getEmail(value);
+    let value = req.session.user_id;
+    let email = getEmail(value);
     let templateVars = {
       userID: value,
       email
@@ -191,17 +192,17 @@ app.get("/urls/new", (req, res) => {
 // Add URL page (/urls/new)
 
 app.get("/urls/:id", (req, res) => { 
-  var shortURL = req.params.id; 
+  let shortURL = req.params.id; 
   // get the id from the requirement parameters
   // console.log("app.get '/urls/:id' " + shortURL);
-  var longURL = getLongURL(shortURL);
+  let longURL = getLongURL(shortURL);
   if (req.session.user_id === getCookie(req.session.user_id)){  
     if (!longURL){
       res.status(400);
       res.send("400 Bad Request Error: The short URL that you requested does not exist.");
     } else { 
-      const value = req.session.user_id;
-      const email = getEmail(value);
+      let value = req.session.user_id;
+      let email = getEmail(value);
       let templateVars = {
         shortURLs: shortURL,
         longURLs: longURL,
@@ -254,11 +255,11 @@ app.get("/urls", (req, res) => { // reads the /urls page
 // POST METHODS BELOW
 
 app.post("/urls", (req, res) => {
-  const response = generateRandomString();
+  let response = generateRandomString();
   // assigns a constant to the randomly generated string
-  const longURL = req.body.longURL;
+  let longURL = req.body.longURL;
   if (req.session.user_id === getCookie(req.session.user_id)){
-    const userID = req.session.user_id;
+    let userID = req.session.user_id;
     urlDatabase[response] = {
       link: longURL,
       id: userID
@@ -270,8 +271,8 @@ app.post("/urls", (req, res) => {
 })
 
 
-app.post("/urls/:id/delete", (req, res) => {
-  const id = req.params.id;
+app.delete("/urls/:id", (req, res) => {
+  let id = req.params.id;
   if (req.session.user_id === getCookie(req.session.user_id)){
     delete urlDatabase[id];
     res.redirect('/urls');
@@ -282,10 +283,10 @@ app.post("/urls/:id/delete", (req, res) => {
 // handles DELETE: deletes an item from the urlDatabase
 
 
-app.post("/urls/:id/update", (req, res) => {
-  const linkID = req.params.id;
+app.put("/urls/:id", (req, res) => {
+  let linkID = req.params.id;
   // acquires the id from the url string (shortURL)
-  const newURL = req.body.updateURL;
+  let newURL = req.body.updateURL;
   // acquires the new url from the user's input
   if (req.session.user_id === getCookie(req.session.user_id)){
     // if the user's ID is attached to the link within the URL database
@@ -303,11 +304,11 @@ app.post("/urls/:id/update", (req, res) => {
 
 
 app.post("/login", (req, res) => {
-  const loginEmail = req.body.email.toString();
+  let loginEmail = req.body.email.toString();
   // gets the login email
-  const loginPass = req.body.password.toString();
+  let loginPass = req.body.password.toString();
   // gets the login password
-  const userID = getUserID(loginEmail, loginPass);
+  let userID = getUserID(loginEmail, loginPass);
   if (loginEmail){
     if (loginPass){
       if (validateUser(loginEmail, loginPass)){
@@ -336,10 +337,10 @@ app.post("/logout", (req, res) => {
 
 
 app.post("/register", (req, res) => {
-  const randomID = "user" + Math.random().toString(36).substring(2, 8);
-  const userEmail = req.body.email;
-  const userPass = req.body.password;
-  const hashedPassword = bcrypt.hashSync(userPass, 10);
+  let randomID = "user" + Math.random().toString(36).substring(2, 8);
+  let userEmail = req.body.email;
+  let userPass = req.body.password;
+  let hashedPassword = bcrypt.hashSync(userPass, 10);
   if (!userEmail && !userPass){
     // if no user and password, return error
     res.status(400).send("400 Bad Request Error: Missing email address and password.")
@@ -351,7 +352,7 @@ app.post("/register", (req, res) => {
     res.status(400).send("400 Bad Request Error: Password is missing.");
   } else {
     // if email and password were entered, continue
-    for (var user in users){
+    for (let user in users){
       if (userEmail === checkEmail(userEmail)){
         res.status(400).send("400 Bad Request Error: User's email address is already in use.");
       }

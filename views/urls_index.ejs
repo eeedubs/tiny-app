@@ -13,7 +13,7 @@
                 <form style="display: inline-block; margin-left: 10px" action="/urls/<%= shortURLs[url] %>" method="GET">
                     <input type="submit" value="Edit">
                 </form>
-                <form style="display: inline-block; border-radius: 10px;" action="/urls/<%= shortURLs[url] %>/delete" method="POST">
+                <form style="display: inline-block; border-radius: 10px;" action="/urls/<%= shortURLs[url] %>?_method=DELETE" method="POST">
                     <input type="submit" value="Delete">
                 </form>
             </div>
