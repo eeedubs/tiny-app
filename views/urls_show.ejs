@@ -10,11 +10,12 @@
  <h4>Edit Shortened URL:</h4>
  <% if (userID) { %>
     <div style="font-size: 40">
-        <a href="<%= longURLs %>">localhost:8080/u/<%= shortURLs %></a> --> <%= longURLs %>
+        <a href="<%= longURL %>">localhost:8080/u/<%= shortURL %></a> --> <%= longURL %>
+        <br>Views: <%= viewCount %> Unique: <%= uniqueViewCount %>
     </div>
     <br>
     <div style="display: inline-block"> 
-        <form style="display: inline-block;" action="/urls/<%= shortURLs %>?_method=PUT" method="POST">
+        <form style="display: inline-block;" action="/urls/<%= shortURL %>?_method=PUT" method="POST">
             <input id="updateURL" type="text" name="updateURL" placeholder="Updated URL" style="width: 300px">
             <input style="font-weight: bold; border-radius: 10px; background-color: rgb(170, 170, 240)" 
             type="submit" value="Update">

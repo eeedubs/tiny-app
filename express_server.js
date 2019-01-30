@@ -22,7 +22,9 @@ app.set("view engine", "ejs");
 const urlDatabase = {
   // "b2xVn2": {
   //   "link": "http://www.lighthouselabs.ca", 
-  //   "id": ""
+  //   "id": "",
+  //   "views",
+  //   "unique",
   // },
   // "9sm5xK": {
   //   "link": "http://www.google.com", 
@@ -52,19 +54,20 @@ function generateRandomString() {
 // for the /register page: assigns a new user ID
 
 function getCookie(userID){
-  var cookie;
-  for (var key in users){
+  let cookie;
+  for (let key in users){
     if (users[key].id === userID){
       cookie = users[key].id;
     }
   }
   return cookie;
 }
+
 // for evaluating cookies: if the cookie value of the user matches the ID of a user in the system,
 // the user can access the content/features
 
 function getUserID (email, password){
-  let userID = "";
+  let userID;
   for (let key in users){
     if (users[key].email === email && (bcrypt.compareSync(password, users[key].password))){
       userID = key;
@@ -107,6 +110,17 @@ function validateUser(email, password){
 }
 // for the POST /login page: evaluates if the user's email and password match a user in the system (value)
 
+function isUniqueVisitor(userCookie){
+  for (let url in urlDatabase){
+    for (let cookie in urlDatabase[url].unique){
+      if (urlDatabase[url].unique[cookie] == userCookie){
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 function getLongURL(shortURL){
   let longURL;
   for (let key in urlDatabase){
@@ -119,12 +133,51 @@ function getLongURL(shortURL){
 }
 // gets the long URL based on the short URL
 
+function getViewCount(shortURL){
+  let viewCount;
+  for (let key in urlDatabase){
+    if (key === shortURL){
+      viewCount = urlDatabase[key].views;
+    }
+  }
+  return viewCount;
+}
+
+function getViewsForUser(userCookie){
+  let viewArray = [];
+  for (let url in urlDatabase){
+    if (urlDatabase[url].id === userCookie){
+      viewArray.push(urlDatabase[url].views);
+    }
+  }
+  return viewArray;
+}
+
+function getUniqueViewCount(shortURL){
+  let uniqueCount;
+  for (let url in urlDatabase){
+    if (url === shortURL){
+      uniqueCount = urlDatabase[url].unique.length;
+    }
+  }
+  return uniqueCount;
+}
+
+function getUniqueViewsForUser(userCookie){
+  let uniqueViews = [];
+  for (let url in urlDatabase){
+    if (urlDatabase[url].id === userCookie){
+      uniqueViews.push(urlDatabase[url].unique.length);
+    }
+  }
+  return uniqueViews;
+}
+
 function shortURLsForUser(id){
   let userURLs = [];
   for (let url in urlDatabase){
     if (urlDatabase[url].id === id){
       userURLs.push(url);
-      // console.log("function shortURLsForUser(id): " + userURLs);
     }
   }
   return userURLs;
@@ -136,7 +189,6 @@ function longURLsForUser(id){
   for (let url in urlDatabase){
     if (urlDatabase[url].id === id){
       userURLs.push(urlDatabase[url].link);
-      // console.log("function longURLsForUser(id): " + userURLs);
     }
   }
   return userURLs;
@@ -146,7 +198,8 @@ function longURLsForUser(id){
 // GET REQUESTS:
 
 app.get("/", (req, res) => { //adds "/" to the end of the localhost URL
-  if (req.session.user_id === getCookie(req.session.user_id)){
+  let userID = req.session.user_id;
+  if (userID === getCookie(userID)){
     res.redirect("/urls");
   } else {
     res.redirect("/login");
@@ -176,12 +229,11 @@ app.get("/register", (req, res) => {
 // Register page
 
 app.get("/urls/new", (req, res) => {
-  if (req.session.user_id === getCookie(req.session.user_id)){ 
-    // console.log("app.get '/urls/new': Cookie matched a user in the database."); 
-    let value = req.session.user_id;
-    let email = getEmail(value);
+  let userID = req.session.user_id;
+  if (userID === getCookie(userID)){ 
+    let email = getEmail(userID);
     let templateVars = {
-      userID: value,
+      userID,
       email
     };
     res.render("urls_new", templateVars);
@@ -192,21 +244,23 @@ app.get("/urls/new", (req, res) => {
 // Add URL page (/urls/new)
 
 app.get("/urls/:id", (req, res) => { 
-  let shortURL = req.params.id; 
-  // get the id from the requirement parameters
-  // console.log("app.get '/urls/:id' " + shortURL);
+  let userID = req.session.user_id; 
+  let shortURL = req.params.id;
   let longURL = getLongURL(shortURL);
-  if (req.session.user_id === getCookie(req.session.user_id)){  
+  let viewCount = getViewCount(shortURL);
+  let uniqueViewCount = getUniqueViewCount(shortURL);
+  if (userID === getCookie(userID)){  
     if (!longURL){
       res.status(400);
       res.send("400 Bad Request Error: The short URL that you requested does not exist.");
     } else { 
-      let value = req.session.user_id;
-      let email = getEmail(value);
+      let email = getEmail(userID);
       let templateVars = {
-        shortURLs: shortURL,
-        longURLs: longURL,
-        userID: value,
+        shortURL,
+        longURL,
+        viewCount,
+        uniqueViewCount,
+        userID,
         email
       };
       res.render("urls_show", templateVars)
@@ -218,13 +272,19 @@ app.get("/urls/:id", (req, res) => {
 // Edit URL page (/urls/:id)
 
 
-app.get("/u/:shortURL", (req, res) => {
+app.route("/u/:shortURL").get(function(req, res){
   let shortURL = req.params.shortURL;
   let longURL = getLongURL(shortURL);
+  let userID = req.session.user_id;
+  let userCookie = getCookie(userID);
   if (!urlDatabase[shortURL]){
     // if there is no shortURL in the URL database
     res.status(400).send("400 Bad Request Error: The shortened URL that you requested does not exist");
   } else {
+    urlDatabase[shortURL].views += 1;
+    if (!isUniqueVisitor(userCookie)){
+      urlDatabase[shortURL].unique.push(userCookie);
+    } 
     res.redirect(301, longURL); 
     // else, redirect to the URL
   }
@@ -233,16 +293,20 @@ app.get("/u/:shortURL", (req, res) => {
 
 
 app.get("/urls", (req, res) => { // reads the /urls page
-  if (req.session.user_id === getCookie(req.session.user_id)){  
-    let value = req.session.user_id; 
-    let shortURLs = shortURLsForUser(value);
-    let longURLs = longURLsForUser(value);
-    let email = getEmail(value);
+  let userID = req.session.user_id; 
+  if (userID === getCookie(userID)){  
+    let viewCount = getViewsForUser(userID);
+    let uniqueViews = getUniqueViewsForUser(userID);
+    let shortURLs = shortURLsForUser(userID);
+    let longURLs = longURLsForUser(userID);
+    let email = getEmail(userID);
     let templateVars = { 
       // let template vars contain the urls and the username
-      longURLs: longURLs,
-      shortURLs: shortURLs,
-      userID: value,
+      longURLs,
+      shortURLs,
+      userID: userID,
+      viewCount,
+      uniqueViews,
       email
     };
     res.render("urls_index", templateVars);
@@ -255,14 +319,16 @@ app.get("/urls", (req, res) => { // reads the /urls page
 // POST METHODS BELOW
 
 app.post("/urls", (req, res) => {
-  let response = generateRandomString();
+  let shortURL = generateRandomString();
   // assigns a constant to the randomly generated string
   let longURL = req.body.longURL;
-  if (req.session.user_id === getCookie(req.session.user_id)){
-    let userID = req.session.user_id;
-    urlDatabase[response] = {
+  let userID = req.session.user_id;
+  if (userID === getCookie(userID)){
+    urlDatabase[shortURL] = {
       link: longURL,
-      id: userID
+      id: userID,
+      views: 0,
+      unique: []
     }
     res.redirect("/urls");
   } else if (!req.session.user_login){
@@ -273,7 +339,8 @@ app.post("/urls", (req, res) => {
 
 app.delete("/urls/:id", (req, res) => {
   let id = req.params.id;
-  if (req.session.user_id === getCookie(req.session.user_id)){
+  let userID = req.session.user_id;
+  if (req.session.user_id === getCookie(userID)){
     delete urlDatabase[id];
     res.redirect('/urls');
   } else {
@@ -284,15 +351,15 @@ app.delete("/urls/:id", (req, res) => {
 
 
 app.put("/urls/:id", (req, res) => {
-  let linkID = req.params.id;
+  let shortURL = req.params.id;
   // acquires the id from the url string (shortURL)
   let newURL = req.body.updateURL;
   // acquires the new url from the user's input
-  if (req.session.user_id === getCookie(req.session.user_id)){
+  let userID = req.session.user_id;
+  if (req.session.user_id === getCookie(userID)){
     // if the user's ID is attached to the link within the URL database
-    var userID = req.session.user_id;
-    if (urlDatabase[linkID].id === userID){
-      urlDatabase[linkID].link = newURL;
+    if (urlDatabase[shortURL].id === userID){
+      urlDatabase[shortURL].link = newURL;
       res.redirect('/urls');
     }
   } else {
